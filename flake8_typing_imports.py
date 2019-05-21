@@ -1,5 +1,7 @@
 import ast
 import collections
+import configparser
+import os.path
 from typing import Any
 from typing import Dict
 from typing import Generator
@@ -402,10 +404,21 @@ class Plugin:
 
     @classmethod
     def parse_options(cls, options: Any) -> None:
-        v = Version.parse(options.min_python_version)
-        if v < Version(3, 5):
-            raise ValueError(f'min-python-version ({v}): must be >= 3.5')
-        elif v not in VERSIONS:
+        cfg = configparser.ConfigParser()
+        cfg.add_section('options')
+        cfg['options']['python_requires'] = f'>={options.min_python_version}'
+
+        if os.path.exists('setup.cfg'):
+            cfg.read('setup.cfg')
+
+        v = cls._min_python_version
+        for part in cfg['options']['python_requires'].split(','):
+            part = part.strip()
+            if part.startswith('>='):
+                v = Version.parse(part[2:])
+
+        v = max(v, SYMBOLS[0][0])
+        if v not in VERSIONS:
             raise ValueError(f'min-python-version ({v}): unknown version')
         cls._min_python_version = v
 
