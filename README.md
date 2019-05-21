@@ -12,16 +12,34 @@ flake8 plugin which checks that typing imports are properly guarded
 
 ## rationale
 
+unfortunately, the `typing` module has been pretty unstable -- it has seen api
+changes in 3.5.0, 3.5.2, 3.5.3, 3.5.4, 3.6.0, 3.6.1, 3.6.2, and 3.7.0!
+
 depending on your supported version of python, you may need to guard your
 imports by `if TYPE_CHECKING:` (3.5.2+) or `if False:` if the things you are
 importing aren't available in all the pythons you support.
 
-unfortunately, the `typing` module has been pretty unstable -- it has seen api
-changes in 3.5.0, 3.5.2, 3.5.3, 3.5.4, 3.6.0, 3.6.1, 3.6.2, and 3.7.0!
-
 as it's pretty difficult to keep track of what version things changed and you
 can't always test against particular patch versions of python, this plugin
 helps you statically check this automatically!
+
+```python
+# default / --min-python-version 3.5.0
+from typing import Type  # TYP001
+```
+
+```python
+# default / --min-python-version 3.5.0
+if False:
+    from typing import Type  # OK!
+```
+
+```python
+# --min-python-version 3.7.0
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from typing import OrderedDict  # OK!
+```
 
 ## configuration
 
