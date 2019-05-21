@@ -13,8 +13,8 @@ def version_ctx(v):
 
 
 @pytest.fixture(autouse=True)
-def reset_version():
-    with version_ctx(Plugin._min_python_version):
+def reset_version(tmpdir):
+    with version_ctx(Plugin._min_python_version), tmpdir.as_cwd():
         yield
 
 
@@ -26,11 +26,24 @@ def test_option_parsing():
     assert Plugin._min_python_version == Version(3, 6, 2)
 
 
-def test_option_parsing_error_too_old():
-    with pytest.raises(ValueError) as excinfo:
-        Plugin.parse_options(mock.Mock(min_python_version='3.4'))
-    msg, = excinfo.value.args
-    assert msg == 'min-python-version (3.4.0): must be >= 3.5'
+def test_option_parsing_python_requires_setup_cfg(tmpdir):
+    tmpdir.join('setup.cfg').write('[options]\npython_requires = >=3.6')
+    Plugin.parse_options(mock.Mock(min_python_version='3.5.0'))
+    assert Plugin._min_python_version == Version(3, 6)
+
+
+def test_option_parsing_python_requires_more_complicated(tmpdir):
+    tmpdir.join('setup.cfg').write(
+        '[options]\n'
+        'python_requires = >=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
+    )
+    Plugin.parse_options(mock.Mock(min_python_version='3.6.0'))
+    assert Plugin._min_python_version == Version(3, 5)
+
+
+def test_option_parsing_minimum_version():
+    Plugin.parse_options(mock.Mock(min_python_version='3.4'))
+    assert Plugin._min_python_version == Version(3, 5)
 
 
 def test_option_parsing_error_unknown():
