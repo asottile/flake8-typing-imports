@@ -13,7 +13,7 @@ flake8 plugin which checks that typing imports are properly guarded
 ## rationale
 
 unfortunately, the `typing` module has been pretty unstable -- it has seen api
-changes in 3.5.0, 3.5.2, 3.5.3, 3.5.4, 3.6.0, 3.6.1, 3.6.2, and 3.7.0!
+changes in 3.5.0, 3.5.2, 3.5.3, 3.5.4, 3.6.0, 3.6.1, 3.6.2, 3.7.0, and 3.7.2!
 
 depending on your supported version of python, you may need to guard your
 imports by `if TYPE_CHECKING:` (3.5.2+) or `if False:` if the things you are
