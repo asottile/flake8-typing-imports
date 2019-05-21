@@ -77,5 +77,5 @@ Sample `.pre-commit-config.yaml`:
     rev: 3.7.7
     hooks:
     -   id: flake8
-        additional_dependencies: [flake8-typing-imports==1.0.0]
+        additional_dependencies: [flake8-typing-imports==1.1.0]
 ```
