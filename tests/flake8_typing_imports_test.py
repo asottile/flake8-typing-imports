@@ -98,3 +98,23 @@ def test_guard_by_type_checking():
             '    from typing import DEFINITELY_WRONG\n',
         )
         assert ret == set()
+
+
+def test_missing_overload_define():
+    with version_ctx(Version(3, 5, 0)):
+        ret = results('from typing import overload')
+        assert ret == {
+            '1:0: TYP002 @overload is broken in <3.5.2, '
+            'add `if sys.version_info < (3, 5, 2): def overload(f): return f`',
+        }
+        assert not results(
+            'import sys\n'
+            'from typing import overload\n'
+            'if sys.version_info < (3, 5, 2):\n'
+            '    def overload(f):\n'
+            '        return f\n'
+            '@overload\n'
+            'def f(x): pass\n',
+        )
+    with version_ctx(Version(3, 5, 2)):
+        assert not results('from typing import overload')

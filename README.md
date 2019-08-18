@@ -10,6 +10,13 @@ flake8 plugin which checks that typing imports are properly guarded
 
 `pip install flake8-typing-imports`
 
+## flake8 codes
+
+| Code   | Description                     |
+|--------|---------------------------------|
+| TYP001 | guard import by `TYPE_CHECKING` |
+| TYP002 | `@overload` is broken in <3.5.2 |
+
 ## rationale
 
 unfortunately, the `typing` module has been pretty unstable -- it has seen api
@@ -32,6 +39,20 @@ from typing import Type  # TYP001
 # default / --min-python-version 3.5.0
 if False:
     from typing import Type  # OK!
+```
+
+```python
+# default / --min-python-version 3.5.0
+from typing import overload  # TYP002
+```
+
+```python
+# default / --min-python-version 3.5.0
+import sys
+from typing import overload  # OK!
+if sys.version_info < (3, 5, 2):
+    def overload(f):
+        return f
 ```
 
 ```python

@@ -39,7 +39,7 @@ SYMBOLS = (
             'SupportsAbs', 'SupportsBytes', 'SupportsComplex', 'SupportsFloat',
             'SupportsInt', 'SupportsRound', 'TextIO', 'Tuple', 'TypeVar',
             'Union', 'ValuesView', 'cast', 'get_type_hints', 'no_type_check',
-            'no_type_check_decorator',
+            'no_type_check_decorator', 'overload',
         )),
     ),
     (
@@ -53,7 +53,7 @@ SYMBOLS = (
             'SupportsAbs', 'SupportsBytes', 'SupportsComplex', 'SupportsFloat',
             'SupportsInt', 'SupportsRound', 'TextIO', 'Tuple', 'TypeVar',
             'Union', 'ValuesView', 'cast', 'get_type_hints', 'no_type_check',
-            'no_type_check_decorator',
+            'no_type_check_decorator', 'overload',
         )),
     ),
     (
@@ -442,11 +442,17 @@ class Visitor(ast.NodeVisitor):
         self._level = -1
         self.imports: Dict[str, List[Tuple[int, int]]]
         self.imports = collections.defaultdict(list)
+        self.defined_overload = False
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
         if node.module == 'typing' and self._level == 0:
             for name in node.names:
                 self.imports[name.name].append((node.lineno, node.col_offset))
+        self.generic_visit(node)
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        if self._level == 1 and node.name == 'overload':
+            self.defined_overload = True
         self.generic_visit(node)
 
     def generic_visit(self, node: ast.AST) -> None:
@@ -518,3 +524,15 @@ class Plugin:
         for (line, col, k), versions in error_versions.items():
             versions_s = ', '.join(str(v) for v in versions)
             yield line, col, msg.format(k, versions_s), type(self)
+
+        msg = (
+            'TYP002 @overload is broken in <3.5.2, '
+            'add `if sys.version_info < (3, 5, 2): def overload(f): return f`'
+        )
+        if (
+                self._min_python_version < Version(3, 5, 2) and
+                'overload' in visitor.imports and
+                not visitor.defined_overload
+        ):
+            for line, col in visitor.imports['overload']:
+                yield line, col, msg, type(self)
