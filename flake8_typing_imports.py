@@ -39,7 +39,7 @@ SYMBOLS = (
             'SupportsAbs', 'SupportsBytes', 'SupportsComplex', 'SupportsFloat',
             'SupportsInt', 'SupportsRound', 'TextIO', 'Tuple', 'TypeVar',
             'Union', 'ValuesView', 'cast', 'get_type_hints', 'no_type_check',
-            'no_type_check_decorator', 'overload',
+            'no_type_check_decorator',
         )),
     ),
     (
@@ -53,7 +53,7 @@ SYMBOLS = (
             'SupportsAbs', 'SupportsBytes', 'SupportsComplex', 'SupportsFloat',
             'SupportsInt', 'SupportsRound', 'TextIO', 'Tuple', 'TypeVar',
             'Union', 'ValuesView', 'cast', 'get_type_hints', 'no_type_check',
-            'no_type_check_decorator', 'overload',
+            'no_type_check_decorator',
         )),
     ),
     (
@@ -322,6 +322,24 @@ SYMBOLS = (
         )),
     ),
     (
+        Version(3, 6, 9), frozenset((
+            'AbstractSet', 'Any', 'AnyStr', 'AsyncContextManager',
+            'AsyncGenerator', 'AsyncIterable', 'AsyncIterator', 'Awaitable',
+            'BinaryIO', 'ByteString', 'Callable', 'ChainMap', 'ClassVar',
+            'Collection', 'Container', 'ContextManager', 'Coroutine',
+            'Counter', 'DefaultDict', 'Deque', 'Dict', 'FrozenSet',
+            'Generator', 'Generic', 'GenericMeta', 'Hashable', 'IO',
+            'ItemsView', 'Iterable', 'Iterator', 'KeysView', 'List', 'Mapping',
+            'MappingView', 'Match', 'MutableMapping', 'MutableSequence',
+            'MutableSet', 'NamedTuple', 'NewType', 'NoReturn', 'Optional',
+            'Pattern', 'Reversible', 'Sequence', 'Set', 'Sized', 'SupportsAbs',
+            'SupportsBytes', 'SupportsComplex', 'SupportsFloat', 'SupportsInt',
+            'SupportsRound', 'TYPE_CHECKING', 'Text', 'TextIO', 'Tuple',
+            'Type', 'TypeVar', 'Union', 'ValuesView', 'cast', 'get_type_hints',
+            'no_type_check', 'no_type_check_decorator', 'overload',
+        )),
+    ),
+    (
         Version(3, 7, 0), frozenset((
             'AbstractSet', 'Any', 'AnyStr', 'AsyncContextManager',
             'AsyncGenerator', 'AsyncIterable', 'AsyncIterator', 'Awaitable',
@@ -378,6 +396,25 @@ SYMBOLS = (
     ),
     (
         Version(3, 7, 3), frozenset((
+            'AbstractSet', 'Any', 'AnyStr', 'AsyncContextManager',
+            'AsyncGenerator', 'AsyncIterable', 'AsyncIterator', 'Awaitable',
+            'BinaryIO', 'ByteString', 'Callable', 'ChainMap', 'ClassVar',
+            'Collection', 'Container', 'ContextManager', 'Coroutine',
+            'Counter', 'DefaultDict', 'Deque', 'Dict', 'ForwardRef',
+            'FrozenSet', 'Generator', 'Generic', 'Hashable', 'IO', 'ItemsView',
+            'Iterable', 'Iterator', 'KeysView', 'List', 'Mapping',
+            'MappingView', 'Match', 'MutableMapping', 'MutableSequence',
+            'MutableSet', 'NamedTuple', 'NewType', 'NoReturn', 'Optional',
+            'OrderedDict', 'Pattern', 'Reversible', 'Sequence', 'Set', 'Sized',
+            'SupportsAbs', 'SupportsBytes', 'SupportsComplex', 'SupportsFloat',
+            'SupportsInt', 'SupportsRound', 'TYPE_CHECKING', 'Text', 'TextIO',
+            'Tuple', 'Type', 'TypeVar', 'Union', 'ValuesView', 'cast',
+            'get_type_hints', 'no_type_check', 'no_type_check_decorator',
+            'overload',
+        )),
+    ),
+    (
+        Version(3, 7, 4), frozenset((
             'AbstractSet', 'Any', 'AnyStr', 'AsyncContextManager',
             'AsyncGenerator', 'AsyncIterable', 'AsyncIterator', 'Awaitable',
             'BinaryIO', 'ByteString', 'Callable', 'ChainMap', 'ClassVar',

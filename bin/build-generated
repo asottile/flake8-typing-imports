@@ -48,6 +48,10 @@ def get_defined_names(v: Tuple[int, ...], s: bytes) -> Set[str]:
         check=True,
     )
     ret = set(json.loads(proc.stdout))
+    # overload is broken in these versions
+    if v < (3, 5, 2):
+        ret.discard('overload')
+    # Final in these versions isn't the type it eventually becomes
     if v < (3, 5, 3):
         ret.discard('Final')
     return ret
