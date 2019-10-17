@@ -2,6 +2,7 @@ import ast
 import collections
 import configparser
 import os.path
+import sys
 from typing import Any
 from typing import Dict
 from typing import Generator
@@ -10,7 +11,10 @@ from typing import NamedTuple
 from typing import Tuple
 from typing import Type
 
-import importlib_metadata
+if sys.version_info < (3, 8):  # pragma: no cover (<PY38)
+    import importlib_metadata
+else:  # pragma: no cover (PY38+)
+    import importlib.metadata as importlib_metadata
 
 
 class Version(NamedTuple):
