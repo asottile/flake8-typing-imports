@@ -4,10 +4,12 @@ import configparser
 import os.path
 import sys
 from typing import Any
+from typing import Container
 from typing import Dict
 from typing import Generator
 from typing import List
 from typing import NamedTuple
+from typing import Set
 from typing import Tuple
 from typing import Type
 
@@ -447,16 +449,50 @@ class Visitor(ast.NodeVisitor):
         self.imports: Dict[str, List[Tuple[int, int]]]
         self.imports = collections.defaultdict(list)
         self.defined_overload = False
+        self.unions_pattern_or_match: List[Tuple[int, int]] = []
+        self.from_imported_names: Set[str] = set()
+
+    def _is_typing(self, node: ast.AST, names: Container[str]) -> bool:
+        return (
+            isinstance(node, ast.Name) and
+            node.id in names and
+            node.id in self.from_imported_names
+        ) or (
+            isinstance(node, ast.Attribute) and
+            isinstance(node.value, ast.Name) and
+            node.value.id == 'typing' and
+            node.attr in names
+        )
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
-        if node.module == 'typing' and self._level == 0:
+        if node.module == 'typing':
             for name in node.names:
-                self.imports[name.name].append((node.lineno, node.col_offset))
+                if self._level == 0:
+                    self.imports[name.name].append(
+                        (node.lineno, node.col_offset),
+                    )
+                if not name.asname:
+                    self.from_imported_names.add(name.name)
+
         self.generic_visit(node)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         if self._level == 1 and node.name == 'overload':
             self.defined_overload = True
+        self.generic_visit(node)
+
+    def visit_Subscript(self, node: ast.Subscript) -> None:
+        if (
+            self._is_typing(node.value, ('Union',)) and
+            isinstance(node.slice, ast.Index) and
+            isinstance(node.slice.value, ast.Tuple) and
+            len(node.slice.value.elts) > 1 and
+            any(
+                self._is_typing(x, ('Pattern', 'Match'))
+                for x in node.slice.value.elts
+            )
+        ):
+            self.unions_pattern_or_match.append((node.lineno, node.col_offset))
         self.generic_visit(node)
 
     def generic_visit(self, node: ast.AST) -> None:
@@ -539,4 +575,15 @@ class Plugin:
                 not visitor.defined_overload
         ):
             for line, col in visitor.imports['overload']:
+                yield line, col, msg, type(self)
+
+        msg = (
+            'TYP003 Union[Match, ...] or Union[Pattern, ...] '
+            'must be quoted <3.5.2'
+        )
+        if (
+            self._min_python_version < Version(3, 5, 2) and
+            visitor.unions_pattern_or_match
+        ):
+            for line, col in visitor.unions_pattern_or_match:
                 yield line, col, msg, type(self)
