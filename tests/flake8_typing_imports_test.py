@@ -121,7 +121,7 @@ def test_missing_overload_define():
 
 
 @pytest.mark.parametrize(
-    's', [
+    's', (
         pytest.param(
             'from typing import Pattern, Union\n'
             'def foo(bar: Union[Pattern, str]): pass\n',
@@ -147,13 +147,31 @@ def test_missing_overload_define():
             'def foo(bar: Union[Match, Pattern, int]): pass\n',
             id='Match and Pattern',
         ),
-    ],
+        pytest.param(
+            'from typing import Match as M, Union\n'
+            'def foo(bar: Union[M, str]): pass\n',
+            id='Match imported as Name',
+            marks=pytest.mark.xfail(
+                reason='this is broken too, but so unlikely '
+                       'we elect not to detect it',
+            ),
+        ),
+        pytest.param(
+            'from typing import Pattern as P, Union\n'
+            'def foo(bar: Union[P, str]): pass\n',
+            id='Pattern imported as Name',
+            marks=pytest.mark.xfail(
+                reason='this is broken too, but so unlikely '
+                       'we elect not to detect it',
+            ),
+        ),
+    ),
 )
 def test_union_pattern_or_match(s):
     with version_ctx(Version(3, 5, 0)):
         assert results(s) == {
             '2:13: TYP003 Union[Match, ...] or Union[Pattern, ...] '
-            'must be quoted <3.5.2',
+            'must be quoted in <3.5.2',
         }
 
     with version_ctx(Version(3, 5, 2)):
@@ -161,7 +179,7 @@ def test_union_pattern_or_match(s):
 
 
 @pytest.mark.parametrize(
-    's', [
+    's', (
         pytest.param(
             'from bar import Bar\n'
             'def foo(bar: Union[Bar]): pass\n',
@@ -182,12 +200,7 @@ def test_union_pattern_or_match(s):
             'def foo(bar: "Union[Match, str]"): pass\n',
             id='quoted Match',
         ),
-        pytest.param(
-            'from typing import Pattern as Pttrn, Union\n'
-            'def foo(bar: Union[Pttrn, str]): pass\n',
-            id='Pattern imported as Pttrn',
-        ),
-    ],
+    ),
 )
 def test_union_pattern_or_match_noop(s):
     assert not results(s)

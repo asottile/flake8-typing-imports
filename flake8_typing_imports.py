@@ -4,7 +4,6 @@ import configparser
 import os.path
 import sys
 from typing import Any
-from typing import Container
 from typing import Dict
 from typing import Generator
 from typing import List
@@ -452,7 +451,7 @@ class Visitor(ast.NodeVisitor):
         self.unions_pattern_or_match: List[Tuple[int, int]] = []
         self.from_imported_names: Set[str] = set()
 
-    def _is_typing(self, node: ast.AST, names: Container[str]) -> bool:
+    def _is_typing(self, node: ast.AST, names: Tuple[str, ...]) -> bool:
         return (
             isinstance(node, ast.Name) and
             node.id in names and
@@ -465,12 +464,9 @@ class Visitor(ast.NodeVisitor):
         )
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
-        if node.module == 'typing':
+        if node.module == 'typing' and self._level == 0:
             for name in node.names:
-                if self._level == 0:
-                    self.imports[name.name].append(
-                        (node.lineno, node.col_offset),
-                    )
+                self.imports[name.name].append((node.lineno, node.col_offset))
                 if not name.asname:
                     self.from_imported_names.add(name.name)
 
@@ -579,7 +575,7 @@ class Plugin:
 
         msg = (
             'TYP003 Union[Match, ...] or Union[Pattern, ...] '
-            'must be quoted <3.5.2'
+            'must be quoted in <3.5.2'
         )
         if (
             self._min_python_version < Version(3, 5, 2) and
