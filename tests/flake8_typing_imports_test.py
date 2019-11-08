@@ -152,17 +152,10 @@ def test_missing_overload_define():
             'def foo(bar: Union[M, str]): pass\n',
             id='Match imported as Name',
             marks=pytest.mark.xfail(
-                reason='this is broken too, but so unlikely '
-                       'we elect not to detect it',
-            ),
-        ),
-        pytest.param(
-            'from typing import Pattern as P, Union\n'
-            'def foo(bar: Union[P, str]): pass\n',
-            id='Pattern imported as Name',
-            marks=pytest.mark.xfail(
-                reason='this is broken too, but so unlikely '
-                       'we elect not to detect it',
+                reason=(
+                    'this is broken too, but so unlikely we elect not to '
+                    'detect it'
+                ),
             ),
         ),
     ),
