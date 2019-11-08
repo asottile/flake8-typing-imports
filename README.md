@@ -12,10 +12,11 @@ flake8 plugin which checks that typing imports are properly guarded
 
 ## flake8 codes
 
-| Code   | Description                     |
-|--------|---------------------------------|
-| TYP001 | guard import by `TYPE_CHECKING` |
-| TYP002 | `@overload` is broken in <3.5.2 |
+| Code   | Description                                                           |
+|--------|-----------------------------------------------------------------------|
+| TYP001 | guard import by `TYPE_CHECKING`                                       |
+| TYP002 | `@overload` is broken in <3.5.2                                       |
+| TYP003 | `Union[Match, ...]` or `Union[Pattern, ...]` must be quoted in <3.5.2 |
 
 ## rationale
 
@@ -53,6 +54,15 @@ from typing import overload  # OK!
 if sys.version_info < (3, 5, 2):
     def overload(f):
         return f
+```
+
+```python
+# default / --min-python-version 3.5.0
+def foo(bar: Union[Match, str]) -> None: pass  # TYP003
+def foo(bar: "Union[Match, str]") -> None: pass  # OK!
+
+def foo(bar: Union[Pattern, str]) -> None: pass  # TYP003
+def foo(bar: "Union[Pattern, str]") -> None: pass  # OK!
 ```
 
 ```python

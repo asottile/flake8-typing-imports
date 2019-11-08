@@ -118,3 +118,89 @@ def test_missing_overload_define():
         )
     with version_ctx(Version(3, 5, 2)):
         assert not results('from typing import overload')
+
+
+@pytest.mark.parametrize(
+    's', (
+        pytest.param(
+            'from typing import Pattern, Union\n'
+            'def foo(bar: Union[Pattern, str]): pass\n',
+            id='Pattern',
+        ),
+        pytest.param(
+            'import typing\n'
+            'def foo(bar: typing.Union[typing.Pattern, str]): pass\n',
+            id='typing.Pattern',
+        ),
+        pytest.param(
+            'from typing import Match, Union\n'
+            'def foo(bar: Union[Match, str]): pass\n',
+            id='Match',
+        ),
+        pytest.param(
+            'import typing\n'
+            'def foo(bar: typing.Union[typing.Match, str]): pass\n',
+            id='typing.Match',
+        ),
+        pytest.param(
+            'from typing import Match, Pattern, Union\n'
+            'def foo(bar: Union[Match, Pattern, int]): pass\n',
+            id='Match and Pattern',
+        ),
+        pytest.param(
+            'from typing import Match as M, Union\n'
+            'def foo(bar: Union[M, str]): pass\n',
+            id='Match imported as Name',
+            marks=pytest.mark.xfail(
+                reason='this is broken too, but so unlikely '
+                       'we elect not to detect it',
+            ),
+        ),
+        pytest.param(
+            'from typing import Pattern as P, Union\n'
+            'def foo(bar: Union[P, str]): pass\n',
+            id='Pattern imported as Name',
+            marks=pytest.mark.xfail(
+                reason='this is broken too, but so unlikely '
+                       'we elect not to detect it',
+            ),
+        ),
+    ),
+)
+def test_union_pattern_or_match(s):
+    with version_ctx(Version(3, 5, 0)):
+        assert results(s) == {
+            '2:13: TYP003 Union[Match, ...] or Union[Pattern, ...] '
+            'must be quoted in <3.5.2',
+        }
+
+    with version_ctx(Version(3, 5, 2)):
+        assert not results(s)
+
+
+@pytest.mark.parametrize(
+    's', (
+        pytest.param(
+            'from bar import Bar\n'
+            'def foo(bar: Union[Bar]): pass\n',
+            id='neither Pattern, nor Match',
+        ),
+        pytest.param(
+            'from typing import Pattern, Union\n'
+            'def foo(bar: Union[Pattern]): pass\n',
+            id='single Pattern',
+        ),
+        pytest.param(
+            'from typing import Pattern, Union\n'
+            'def foo(bar: "Union[Pattern, str]"): pass\n',
+            id='quoted Pattern',
+        ),
+        pytest.param(
+            'from typing import Match, Union\n'
+            'def foo(bar: "Union[Match, str]"): pass\n',
+            id='quoted Match',
+        ),
+    ),
+)
+def test_union_pattern_or_match_noop(s):
+    assert not results(s)
