@@ -464,7 +464,7 @@ class Visitor(ast.NodeVisitor):
         )
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
-        if node.module == 'typing' and self._level == 0:
+        if node.level == 0 and node.module == 'typing' and self._level == 0:
             for name in node.names:
                 self.imports[name.name].append((node.lineno, node.col_offset))
                 if not name.asname:
