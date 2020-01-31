@@ -100,6 +100,11 @@ def test_guard_by_type_checking():
         assert ret == set()
 
 
+def test_relative_typing_module():
+    ret = results('from .typing import wat')
+    assert ret == set()
+
+
 def test_missing_overload_define():
     with version_ctx(Version(3, 5, 0)):
         ret = results('from typing import overload')
