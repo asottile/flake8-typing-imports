@@ -17,6 +17,8 @@ flake8 plugin which checks that typing imports are properly guarded
 | TYP001 | guard import by `TYPE_CHECKING`                                       |
 | TYP002 | `@overload` is broken in <3.5.2                                       |
 | TYP003 | `Union[Match, ...]` or `Union[Pattern, ...]` must be quoted in <3.5.2 |
+| TYP004 | `NamedTuple` does not support methods in 3.6.0                        |
+| TYP005 | `NamedTuple` does not support defaults in 3.6.0                       |
 
 ## rationale
 
@@ -63,6 +65,15 @@ def foo(bar: "Union[Match, str]") -> None: pass  # OK!
 
 def foo(bar: Union[Pattern, str]) -> None: pass  # TYP003
 def foo(bar: "Union[Pattern, str]") -> None: pass  # OK!
+```
+
+```python
+# --min-python-version 3.6.0
+class NT(NamedTuple):
+    x: int = 5  # TYP005
+
+    def f(self) -> int:  # TYP004
+        return self.x + 4
 ```
 
 ```python
