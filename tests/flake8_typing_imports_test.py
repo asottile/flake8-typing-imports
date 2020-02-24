@@ -29,7 +29,7 @@ def test_option_parsing():
 def test_option_parsing_python_requires_setup_cfg(tmpdir):
     tmpdir.join('setup.cfg').write('[options]\npython_requires = >=3.6')
     Plugin.parse_options(mock.Mock(min_python_version='3.5.0'))
-    assert Plugin._min_python_version == Version(3, 6)
+    assert Plugin._min_python_version == Version(3, 6, 0)
 
 
 def test_option_parsing_python_requires_more_complicated(tmpdir):
@@ -38,12 +38,12 @@ def test_option_parsing_python_requires_more_complicated(tmpdir):
         'python_requires = >=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     )
     Plugin.parse_options(mock.Mock(min_python_version='3.6.0'))
-    assert Plugin._min_python_version == Version(3, 5)
+    assert Plugin._min_python_version == Version(3, 5, 0)
 
 
 def test_option_parsing_minimum_version():
     Plugin.parse_options(mock.Mock(min_python_version='3.4'))
-    assert Plugin._min_python_version == Version(3, 5)
+    assert Plugin._min_python_version == Version(3, 5, 0)
 
 
 def test_option_parsing_error_unknown():
@@ -201,4 +201,44 @@ def test_union_pattern_or_match(s):
     ),
 )
 def test_union_pattern_or_match_noop(s):
+    assert not results(s)
+
+
+def test_namedtuple_methods():
+    s = (
+        'from typing import NamedTuple\n'
+        'class NT(NamedTuple):\n'
+        '    x: int\n'
+        '    def f(self): return self.x + 2\n'
+    )
+    with version_ctx(Version(3, 6, 0)):
+        assert results(s) == {
+            '4:4: TYP004 NamedTuple does not support methods in 3.6.0',
+        }
+
+    with version_ctx(Version(3, 6, 1)):
+        assert results(s) == set()
+
+
+def test_namedtuple_defaults():
+    s = (
+        'from typing import NamedTuple\n'
+        'class NT(NamedTuple):\n'
+        '    x: int = 5\n'
+    )
+    with version_ctx(Version(3, 6, 0)):
+        assert results(s) == {
+            '3:4: TYP005 NamedTuple does not support defaults in 3.6.0',
+        }
+
+    with version_ctx(Version(3, 6, 1)):
+        assert results(s) == set()
+
+
+def test_namedtuple_check_noop():
+    s = (
+        'class C:\n'
+        '    x: int = 2\n'
+        '    def f(self): return self.x + 5\n'
+    )
     assert not results(s)
