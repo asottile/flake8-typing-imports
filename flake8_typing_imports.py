@@ -447,10 +447,11 @@ class Visitor(ast.NodeVisitor):
         self._level = -1
         self.imports: Dict[str, List[Tuple[int, int]]]
         self.imports = collections.defaultdict(list)
+        self.attributes: Dict[str, List[Tuple[int, int]]]
+        self.attributes = collections.defaultdict(list)
         self.defined_overload = False
         self.unions_pattern_or_match: List[Tuple[int, int]] = []
         self.from_imported_names: Set[str] = set()
-
         self._in_namedtuple = False
         self.namedtuple_methods: List[Tuple[int, int]] = []
         self.namedtuple_defaults: List[Tuple[int, int]] = []
@@ -475,6 +476,14 @@ class Visitor(ast.NodeVisitor):
                     self.from_imported_names.add(name.name)
 
         self.generic_visit(node)
+
+    def visit_Attribute(self, node: ast.Attribute) -> None:
+        if (
+                isinstance(node, ast.Attribute) and
+                isinstance(node.value, ast.Name) and
+                node.value.id == 'typing'
+        ):
+            self.attributes[node.attr].append((node.lineno, node.col_offset))
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         if self._level == 1 and node.name == 'overload':
@@ -558,6 +567,25 @@ class Plugin:
     def __init__(self, tree: ast.AST):
         self._tree = tree
 
+    def _version_specific_errors(
+            self,
+            msg: str,
+            name_positions: Dict[str, List[Tuple[int, int]]],
+    ) -> Generator[Tuple[int, int, str, Type[Any]], None, None]:
+        error_versions: Dict[Tuple[int, int, str], List[Version]]
+        error_versions = collections.defaultdict(list)
+
+        for version, symbols in SYMBOLS:
+            if version < self._min_python_version:
+                continue
+            for k in set(name_positions) - symbols:
+                for line, col in name_positions[k]:
+                    error_versions[(line, col, k)].append(version)
+
+        for (line, col, k), versions in error_versions.items():
+            versions_s = ', '.join(str(v) for v in versions)
+            yield line, col, msg.format(k, versions_s), type(self)
+
     def run(self) -> Generator[Tuple[int, int, str, Type[Any]], None, None]:
         visitor = Visitor()
         visitor.visit(self._tree)
@@ -567,20 +595,7 @@ class Plugin:
         else:
             guard = '`if TYPE_CHECKING:`'
         msg = f'TYP001 guard import by {guard}: {{}} (not in {{}})'
-
-        error_versions: Dict[Tuple[int, int, str], List[Version]]
-        error_versions = collections.defaultdict(list)
-
-        for version, symbols in SYMBOLS:
-            if version < self._min_python_version:
-                continue
-            for k in set(visitor.imports) - symbols:
-                for line, col in visitor.imports[k]:
-                    error_versions[(line, col, k)].append(version)
-
-        for (line, col, k), versions in error_versions.items():
-            versions_s = ', '.join(str(v) for v in versions)
-            yield line, col, msg.format(k, versions_s), type(self)
+        yield from self._version_specific_errors(msg, visitor.imports)
 
         msg = (
             'TYP002 @overload is broken in <3.5.2, '
@@ -620,3 +635,6 @@ class Plugin:
         ):
             for line, col in visitor.namedtuple_defaults:
                 yield line, col, msg, type(self)
+
+        msg = 'TYP006 guard `typing` attribute by quoting: {} (not in {})'
+        yield from self._version_specific_errors(msg, visitor.attributes)

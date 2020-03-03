@@ -19,6 +19,7 @@ flake8 plugin which checks that typing imports are properly guarded
 | TYP003 | `Union[Match, ...]` or `Union[Pattern, ...]` must be quoted in <3.5.2 |
 | TYP004 | `NamedTuple` does not support methods in 3.6.0                        |
 | TYP005 | `NamedTuple` does not support defaults in 3.6.0                       |
+| TYP006 | guard `typing` attribute by quoting                                   |
 
 ## rationale
 

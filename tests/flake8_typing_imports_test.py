@@ -242,3 +242,16 @@ def test_namedtuple_check_noop():
         '    def f(self): return self.x + 5\n'
     )
     assert not results(s)
+
+
+def test_attribute():
+    s = (
+        'import typing\n\n'
+        'def f() -> typing.Type:\n'
+        '    pass\n'
+    )
+    with version_ctx(Version(3, 5, 0)):
+        assert results(s) == {
+            '3:11: TYP006 guard `typing` attribute by quoting: Type '
+            '(not in 3.5.0, 3.5.1)',
+        }
