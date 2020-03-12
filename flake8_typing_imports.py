@@ -556,7 +556,7 @@ class Plugin:
         v = cls._min_python_version
         for part in cfg['options']['python_requires'].split(','):
             part = part.strip()
-            if part.startswith('>='):
+            if part.startswith('>=') or part.startswith('~='):
                 v = Version.parse(part[2:])
 
         v = max(v, SYMBOLS[0][0])
