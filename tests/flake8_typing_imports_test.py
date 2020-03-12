@@ -31,6 +31,10 @@ def test_option_parsing_python_requires_setup_cfg(tmpdir):
     Plugin.parse_options(mock.Mock(min_python_version='3.5.0'))
     assert Plugin._min_python_version == Version(3, 6, 0)
 
+def test_option_parsing_python_requires_setup_cfg_tildeequal(tmpdir):
+    tmpdir.join('setup.cfg').write('[options]\npython_requires = ~=3.6')
+    Plugin.parse_options(mock.Mock(min_python_version='3.5.0'))
+    assert Plugin._min_python_version == Version(3, 6, 0)
 
 def test_option_parsing_python_requires_more_complicated(tmpdir):
     tmpdir.join('setup.cfg').write(
