@@ -100,13 +100,16 @@ to use the commandline:
 min_python_version = 3.6.2
 ```
 
-if a `>=` is set for `python_requires` in `setup.cfg`, that value will be used:
+if a `>=` or `~=` is set for `python_requires` in `setup.cfg`, that value will be used:
 
 ```ini
 # setup.cfg setuptools metadata
 
 [options]
 python_requires = >=3.6
+
+[options]
+python_requires = ~=3.6
 ```
 
 ## as a pre-commit hook
