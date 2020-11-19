@@ -18,6 +18,17 @@ else:  # pragma: no cover (PY38+)
     import importlib.metadata as importlib_metadata
 
 
+if sys.version_info < (3, 9):  # pragma: no cover (<PY39)
+    def _get_subscript_slice(node: ast.Subscript) -> ast.AST:
+        if isinstance(node.slice, ast.Index):
+            return node.slice.value
+        else:
+            return node.slice
+else:  # pragma: no cover (PY39+)
+    def _get_subscript_slice(node: ast.Subscript) -> ast.AST:
+        return node.slice
+
+
 class Version(NamedTuple):
     major: int = 0
     minor: int = 0
@@ -856,14 +867,14 @@ class Visitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Subscript(self, node: ast.Subscript) -> None:
+        slice_value = _get_subscript_slice(node)
         if (
             self._is_typing(node.value, ('Union',)) and
-            isinstance(node.slice, ast.Index) and
-            isinstance(node.slice.value, ast.Tuple) and
-            len(node.slice.value.elts) > 1 and
+            isinstance(slice_value, ast.Tuple) and
+            len(slice_value.elts) > 1 and
             any(
                 self._is_typing(x, ('Pattern', 'Match'))
-                for x in node.slice.value.elts
+                for x in slice_value.elts
             )
         ):
             self.unions_pattern_or_match.append((node.lineno, node.col_offset))
