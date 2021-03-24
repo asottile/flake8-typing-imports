@@ -41,6 +41,30 @@ def test_option_parsing_python_requires_more_complicated(tmpdir):
     assert Plugin._min_python_version == Version(3, 5, 0)
 
 
+def test_option_parsing_python_requires_pyproject_toml(tmpdir):
+    tmpdir.join('pyproject.toml').write('[project]\nrequires-python = ">=3.6"')
+    Plugin.parse_options(mock.Mock(min_python_version='3.5.0'))
+    assert Plugin._min_python_version == Version(3, 6, 0)
+
+
+def test_option_parsing_python_requires_pyproject_toml_dynamic(tmpdir):
+    tmpdir.join('pyproject.toml').write(
+        '[project]\n'
+        'dynamic = ["requires-python"]',
+    )
+    Plugin.parse_options(mock.Mock(min_python_version='3.5.0'))
+    assert Plugin._min_python_version == Version(3, 5, 0)
+
+
+def test_option_parsing_python_requires_pyproject_complicated(tmpdir):
+    tmpdir.join('pyproject.toml').write(
+        '[project]\n'
+        'requires-python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"',
+    )
+    Plugin.parse_options(mock.Mock(min_python_version='3.6.0'))
+    assert Plugin._min_python_version == Version(3, 5, 0)
+
+
 def test_option_parsing_minimum_version():
     Plugin.parse_options(mock.Mock(min_python_version='3.4'))
     assert Plugin._min_python_version == Version(3, 5, 0)

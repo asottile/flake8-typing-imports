@@ -12,6 +12,8 @@ from typing import Set
 from typing import Tuple
 from typing import Type
 
+import toml
+
 if sys.version_info < (3, 8):  # pragma: no cover (<PY38)
     import importlib_metadata
 else:  # pragma: no cover (PY38+)
@@ -926,6 +928,8 @@ class Plugin:
 
         if os.path.exists('setup.cfg'):
             cfg.read('setup.cfg')
+        elif os.path.exists('pyproject.toml'):
+            cls._parse_pyproject_toml(cfg)
 
         v = cls._min_python_version
         for part in cfg['options']['python_requires'].split(','):
@@ -937,6 +941,14 @@ class Plugin:
         if v not in VERSIONS:
             raise ValueError(f'min-python-version ({v}): unknown version')
         cls._min_python_version = v
+
+    @classmethod
+    def _parse_pyproject_toml(cls, cfg: configparser.ConfigParser) -> None:
+        with open('pyproject.toml', encoding='UTF-8') as fp:
+            pp_config = toml.load(fp).get('project', {})
+
+        if 'requires-python' in pp_config:
+            cfg['options']['python_requires'] = pp_config['requires-python']
 
     def __init__(self, tree: ast.AST):
         self._tree = tree
