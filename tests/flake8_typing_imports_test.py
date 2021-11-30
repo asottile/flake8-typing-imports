@@ -198,6 +198,11 @@ def test_union_pattern_or_match(s):
             'def foo(bar: "Union[Match, str]"): pass\n',
             id='quoted Match',
         ),
+        pytest.param(
+            'from typing import Union\n'
+            'Union[1:2]\n',
+            id='unrelated, but covers non-slice case',
+        ),
     ),
 )
 def test_union_pattern_or_match_noop(s):

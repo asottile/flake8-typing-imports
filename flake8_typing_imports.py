@@ -12,21 +12,21 @@ from typing import Set
 from typing import Tuple
 from typing import Type
 
-if sys.version_info < (3, 8):  # pragma: no cover (<PY38)
-    import importlib_metadata
-else:  # pragma: no cover (PY38+)
+if sys.version_info >= (3, 8):  # pragma: >=3.8 cover
     import importlib.metadata as importlib_metadata
+else:  # pragma: <3.8 cover
+    import importlib_metadata
 
 
-if sys.version_info < (3, 9):  # pragma: no cover (<PY39)
+if sys.version_info >= (3, 9):  # pragma: >=3.9 cover
+    def _get_subscript_slice(node: ast.Subscript) -> ast.AST:
+        return node.slice
+else:  # pragma: <3.9 cover
     def _get_subscript_slice(node: ast.Subscript) -> ast.AST:
         if isinstance(node.slice, ast.Index):
             return node.slice.value
         else:
             return node.slice
-else:  # pragma: no cover (PY39+)
-    def _get_subscript_slice(node: ast.Subscript) -> ast.AST:
-        return node.slice
 
 
 class Version(NamedTuple):
