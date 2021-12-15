@@ -1304,7 +1304,7 @@ class Plugin:
     @staticmethod
     def add_options(option_manager: Any) -> None:
         option_manager.add_option(
-            '--min-python-version', type='str', metavar='VERSION',
+            '--min-python-version', type=str, metavar='VERSION',
             default='3.5.0', parse_from_config=True,
             help=(
                 'Minimum version of python your code supports, '
