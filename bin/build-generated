@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import argparse
 import json
 import re
 import subprocess
 from typing import Any
-from typing import Dict
-from typing import Set
-from typing import Tuple
 
 TAG_RE = re.compile(r'^v[0-9.]+$')
 
 
-def get_tag_list(repo: str) -> Tuple[str, ...]:
+def get_tag_list(repo: str) -> tuple[str, ...]:
     subprocess.check_call(('git', '-C', repo, 'fetch', '-q', '--tags'))
     out = subprocess.check_output(('git', '-C', repo, 'tag', '--list'))
     return tuple(out.decode().splitlines())
@@ -39,7 +38,7 @@ print(json.dumps([
 '''
 
 
-def get_defined_names(v: Tuple[int, ...], s: bytes) -> Set[str]:
+def get_defined_names(v: tuple[int, ...], s: bytes) -> set[str]:
     """The __all__ of typing is very unreliable: bpo-36983"""
     proc = subprocess.run(
         (f'python{v[0]}.{v[1]}', '-c', PROG),
@@ -55,9 +54,9 @@ def get_defined_names(v: Tuple[int, ...], s: bytes) -> Set[str]:
 
 
 def compare(old: str, new: str) -> None:
-    old_dct: Dict[str, Any] = {'Version': lambda *a: a}
+    old_dct: dict[str, Any] = {'Version': lambda *a: a}
     exec(old, old_dct)
-    new_dct: Dict[str, Any] = {'Version': lambda *a: a}
+    new_dct: dict[str, Any] = {'Version': lambda *a: a}
     exec(new, new_dct)
     for (v, k_old), (_, k_new) in zip(old_dct['SYMBOLS'], new_dct['SYMBOLS']):
         print(str(v).center(79, '='))

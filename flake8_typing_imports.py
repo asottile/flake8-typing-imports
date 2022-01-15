@@ -1,16 +1,13 @@
+from __future__ import annotations
+
 import ast
 import collections
 import configparser
 import os.path
 import sys
 from typing import Any
-from typing import Dict
 from typing import Generator
-from typing import List
 from typing import NamedTuple
-from typing import Set
-from typing import Tuple
-from typing import Type
 
 if sys.version_info >= (3, 8):  # pragma: >=3.8 cover
     import importlib.metadata as importlib_metadata
@@ -38,7 +35,7 @@ class Version(NamedTuple):
         return f'{self.major}.{self.minor}.{self.patch}'
 
     @classmethod
-    def parse(cls, s: str) -> 'Version':
+    def parse(cls, s: str) -> Version:
         return cls(*(int(p) for p in s.split('.')))
 
 
@@ -1213,18 +1210,18 @@ VERSIONS = frozenset(version for version, _ in SYMBOLS)
 class Visitor(ast.NodeVisitor):
     def __init__(self) -> None:
         self._level = -1
-        self.imports: Dict[str, List[Tuple[int, int]]]
+        self.imports: dict[str, list[tuple[int, int]]]
         self.imports = collections.defaultdict(list)
-        self.attributes: Dict[str, List[Tuple[int, int]]]
+        self.attributes: dict[str, list[tuple[int, int]]]
         self.attributes = collections.defaultdict(list)
         self.defined_overload = False
-        self.unions_pattern_or_match: List[Tuple[int, int]] = []
-        self.from_imported_names: Set[str] = set()
+        self.unions_pattern_or_match: list[tuple[int, int]] = []
+        self.from_imported_names: set[str] = set()
         self._in_namedtuple = False
-        self.namedtuple_methods: List[Tuple[int, int]] = []
-        self.namedtuple_defaults: List[Tuple[int, int]] = []
+        self.namedtuple_methods: list[tuple[int, int]] = []
+        self.namedtuple_defaults: list[tuple[int, int]] = []
 
-    def _is_typing(self, node: ast.AST, names: Tuple[str, ...]) -> bool:
+    def _is_typing(self, node: ast.AST, names: tuple[str, ...]) -> bool:
         return (
             isinstance(node, ast.Name) and
             node.id in names and
@@ -1338,9 +1335,9 @@ class Plugin:
     def _version_specific_errors(
             self,
             msg: str,
-            name_positions: Dict[str, List[Tuple[int, int]]],
-    ) -> Generator[Tuple[int, int, str, Type[Any]], None, None]:
-        error_versions: Dict[Tuple[int, int, str], List[Version]]
+            name_positions: dict[str, list[tuple[int, int]]],
+    ) -> Generator[tuple[int, int, str, type[Any]], None, None]:
+        error_versions: dict[tuple[int, int, str], list[Version]]
         error_versions = collections.defaultdict(list)
 
         for version, symbols in SYMBOLS:
@@ -1354,7 +1351,7 @@ class Plugin:
             versions_s = ', '.join(str(v) for v in versions)
             yield line, col, msg.format(k, versions_s), type(self)
 
-    def run(self) -> Generator[Tuple[int, int, str, Type[Any]], None, None]:
+    def run(self) -> Generator[tuple[int, int, str, type[Any]], None, None]:
         visitor = Visitor()
         visitor.visit(self._tree)
 
