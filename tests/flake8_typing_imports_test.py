@@ -21,9 +21,9 @@ def reset_version(tmpdir):
 
 
 def test_option_parsing():
-    mgr = OptionManager('flake8', '0')
+    mgr = OptionManager(version='0', plugin_versions='', parents=[])
     Plugin.add_options(mgr)
-    options, _ = mgr.parse_args(['--min-python-version', '3.6.2'])
+    options = mgr.parse_args(['--min-python-version', '3.6.2'])
     Plugin.parse_options(options)
     assert Plugin._min_python_version == Version(3, 6, 2)
 
