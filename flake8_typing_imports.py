@@ -9,12 +9,6 @@ from typing import Any
 from typing import Generator
 from typing import NamedTuple
 
-if sys.version_info >= (3, 8):  # pragma: >=3.8 cover
-    import importlib.metadata as importlib_metadata
-else:  # pragma: <3.8 cover
-    import importlib_metadata
-
-
 if sys.version_info >= (3, 9):  # pragma: >=3.9 cover
     def _get_subscript_slice(node: ast.Subscript) -> ast.AST:
         return node.slice
@@ -1293,9 +1287,6 @@ class Visitor(ast.NodeVisitor):
 
 
 class Plugin:
-    name = __name__
-    version = importlib_metadata.version(__name__)
-
     _min_python_version = Version(3, 5, 0)
 
     @staticmethod
