@@ -9,7 +9,9 @@ flake8 plugin which checks that typing imports are properly guarded
 
 ## installation
 
-`pip install flake8-typing-imports`
+```bash
+pip install flake8-typing-imports
+```
 
 ## flake8 codes
 
