@@ -21,7 +21,12 @@ def reset_version(tmpdir):
 
 
 def test_option_parsing():
-    mgr = OptionManager(version='0', plugin_versions='', parents=[])
+    mgr = OptionManager(
+        version='0',
+        plugin_versions='',
+        formatter_names=(),
+        parents=[],
+    )
     Plugin.add_options(mgr)
     options = mgr.parse_args(['--min-python-version', '3.6.2'])
     Plugin.parse_options(options)
