@@ -5,7 +5,6 @@ import argparse
 import json
 import re
 import subprocess
-from typing import Any
 
 TAG_RE = re.compile(r'^v[0-9.]+$')
 
@@ -40,8 +39,14 @@ print(json.dumps([
 
 def get_defined_names(v: tuple[int, ...], s: bytes) -> set[str]:
     """The __all__ of typing is very unreliable: bpo-36983"""
+    # my computer no longer has python <3.7
+    if v < (3, 7):
+        preamble: tuple[str, ...]
+        preamble = ('docker', 'run', '--rm', '-i', f'python:{v[0]}.{v[1]}')
+    else:
+        preamble = ()
     proc = subprocess.run(
-        (f'python{v[0]}.{v[1]}', '-c', PROG),
+        (*preamble, f'python{v[0]}.{v[1]}', '-c', PROG),
         input=s,
         stdout=subprocess.PIPE,
         check=True,
@@ -51,19 +56,6 @@ def get_defined_names(v: tuple[int, ...], s: bytes) -> set[str]:
     if v < (3, 5, 3):
         ret.discard('Final')
     return ret
-
-
-def compare(old: str, new: str) -> None:
-    old_dct: dict[str, Any] = {'Version': lambda *a: a}
-    exec(old, old_dct)
-    new_dct: dict[str, Any] = {'Version': lambda *a: a}
-    exec(new, new_dct)
-    for (v, k_old), (_, k_new) in zip(old_dct['SYMBOLS'], new_dct['SYMBOLS']):
-        print(str(v).center(79, '='))
-        for added in sorted(k_new - k_old):
-            print(f'+{added}')
-        for removed in sorted(k_old - k_new):
-            print(f'-{removed}')
 
 
 def main() -> int:
@@ -82,23 +74,43 @@ def main() -> int:
         names = get_defined_names(version, subprocess.check_output(cmd))
         ret.append((version, names))
 
-    parts = ['SYMBOLS = (']
-    for version, symbols_set in sorted(ret):
-        symbols = sorted(symbols_set)
-        parts.append('    (')
-        vstr = ', '.join(str(p) for p in version)
-        parts.append(f'        Version({vstr}), frozenset((')
-        accum = f'            {symbols[0]!r},'
+    def _add_symbols(symbols: list[str]) -> None:
+        accum = f'        {symbols[0]!r},'
         for symbol in symbols[1:]:
             if len(accum) + len(repr(symbol)) + 2 < 80:
                 accum += f' {symbol!r},'
             else:
                 parts.append(f'{accum}')
-                accum = f'            {symbol!r},'
+                accum = f'        {symbol!r},'
         parts.append(f'{accum}')
-        parts.append('        )),')
-        parts.append('    ),')
-    parts.append(')')
+
+    parts = ['SYMBOLS = []']
+    prev: set[str] = set()
+    for version, symbols_set in sorted(ret):
+        vstr = ', '.join(str(p) for p in version)
+        if version[-1] == 0:
+            parts.append('SYMBOLS.append((')
+            parts.append(f'    Version({vstr}), frozenset((')
+            _add_symbols(sorted(symbols_set))
+            parts.append('    )),')
+            parts.append('))')
+        else:
+            assert symbols_set >= prev, version
+            if symbols_set == prev:
+                parts.append(
+                    f'SYMBOLS.append((Version({vstr}), SYMBOLS[-1][1]))',
+                )
+            else:
+                syms = ', '.join(repr(s) for s in sorted(symbols_set - prev))
+                if ',' not in syms:
+                    syms = f'{syms},'
+                parts.append('SYMBOLS.append((')
+                parts.append(f'    Version({vstr}), SYMBOLS[-1][1].union((')
+                _add_symbols(sorted(symbols_set - prev))
+                parts.append('    )),')
+                parts.append('))')
+        prev = symbols_set
+
     new = '\n'.join(parts) + '\n'
 
     with open('flake8_typing_imports.py') as f:
@@ -109,8 +121,6 @@ def main() -> int:
 
     with open('flake8_typing_imports.py', 'w') as f:
         f.write(p1 + p2 + new + p3 + p4)
-
-    compare(old, new)
 
     return 0
 
