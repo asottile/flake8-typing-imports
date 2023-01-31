@@ -39,14 +39,15 @@ print(json.dumps([
 
 def get_defined_names(v: tuple[int, ...], s: bytes) -> set[str]:
     """The __all__ of typing is very unreliable: bpo-36983"""
+    vstr = '{}.{}'.format(*v)
     # my computer no longer has python <3.7
     if v < (3, 7):
         preamble: tuple[str, ...]
-        preamble = ('docker', 'run', '--rm', '-i', f'python:{v[0]}.{v[1]}')
+        preamble = ('docker', 'run', '--rm', '-i', f'python:{vstr}-slim')
     else:
         preamble = ()
     proc = subprocess.run(
-        (*preamble, f'python{v[0]}.{v[1]}', '-c', PROG),
+        (*preamble, f'python{vstr}', '-c', PROG),
         input=s,
         stdout=subprocess.PIPE,
         check=True,
