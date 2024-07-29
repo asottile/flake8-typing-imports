@@ -446,7 +446,7 @@ class Plugin:
             self,
             msg: str,
             name_positions: dict[str, list[tuple[int, int]]],
-    ) -> Generator[tuple[int, int, str, type[Any]], None, None]:
+    ) -> Generator[tuple[int, int, str, type[Any]]]:
         error_versions: dict[tuple[int, int, str], list[Version]]
         error_versions = collections.defaultdict(list)
 
@@ -461,7 +461,7 @@ class Plugin:
             versions_s = ', '.join(str(v) for v in versions)
             yield line, col, msg.format(k, versions_s), type(self)
 
-    def run(self) -> Generator[tuple[int, int, str, type[Any]], None, None]:
+    def run(self) -> Generator[tuple[int, int, str, type[Any]]]:
         visitor = Visitor()
         visitor.visit(self._tree)
 
