@@ -18,10 +18,22 @@ def get_tag_list(repo: str) -> tuple[str, ...]:
 PROG = '''\
 import json
 import sys
-globs = {'__name__': 'typing'}
-exec(compile(sys.stdin.read(), '<typing>', 'exec'), globs)
-_typing = type('typing', (), globs)
-print(json.dumps([
+import types
+
+_typing = types.ModuleType('typing')
+exec(compile(sys.stdin.read(), '<typing>', 'exec'), _typing.__dict__)
+
+lst = []
+
+# populate lazy attributes (Match, Pattern, etc.)
+if sys.version_info >= (3, 13):
+    for k in _typing.__all__:
+        getattr(_typing, k)
+else:
+    lst.extend(_typing.io.__all__)
+    lst.extend(_typing.re.__all__)
+
+lst.extend([
     k for k, v in vars(_typing).items()
     if k not in {'io', 're'}
     if k in _typing.__all__ or (
@@ -33,7 +45,8 @@ print(json.dumps([
         # but export all things that have __module__ == 'typing'
         getattr(v, '__module__', None) == _typing.__name__
     )
-] + _typing.io.__all__ + _typing.re.__all__))
+])
+print(json.dumps(lst))
 '''
 
 
