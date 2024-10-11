@@ -4,20 +4,9 @@ import ast
 import collections
 import configparser
 import os.path
-import sys
+from collections.abc import Generator
 from typing import Any
-from typing import Generator
 from typing import NamedTuple
-
-if sys.version_info >= (3, 9):  # pragma: >=3.9 cover
-    def _get_subscript_slice(node: ast.Subscript) -> ast.AST:
-        return node.slice
-else:  # pragma: <3.9 cover
-    def _get_subscript_slice(node: ast.Subscript) -> ast.AST:
-        if isinstance(node.slice, ast.Index):
-            return node.slice.value
-        else:
-            return node.slice
 
 
 class Version(NamedTuple):
@@ -414,14 +403,13 @@ class Visitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def visit_Subscript(self, node: ast.Subscript) -> None:
-        slice_value = _get_subscript_slice(node)
         if (
             self._is_typing(node.value, ('Union',)) and
-            isinstance(slice_value, ast.Tuple) and
-            len(slice_value.elts) > 1 and
+            isinstance(node.slice, ast.Tuple) and
+            len(node.slice.elts) > 1 and
             any(
                 self._is_typing(x, ('Pattern', 'Match'))
-                for x in slice_value.elts
+                for x in node.slice.elts
             )
         ):
             self.unions_pattern_or_match.append((node.lineno, node.col_offset))
