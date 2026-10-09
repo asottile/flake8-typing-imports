@@ -224,6 +224,7 @@ SYMBOLS.append((Version(3, 9, 21), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 9, 22), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 9, 23), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 9, 24), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 9, 25), SYMBOLS[-1][1]))
 SYMBOLS.append((
     Version(3, 10, 0), frozenset((
         'AbstractSet', 'Annotated', 'Any', 'AnyStr', 'AsyncContextManager',
@@ -264,6 +265,9 @@ SYMBOLS.append((Version(3, 10, 16), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 10, 17), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 10, 18), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 10, 19), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 10, 20), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 10, 21), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 10, 22), SYMBOLS[-1][1]))
 SYMBOLS.append((
     Version(3, 11, 0), frozenset((
         'AbstractSet', 'Annotated', 'Any', 'AnyStr', 'AsyncContextManager',
@@ -302,6 +306,9 @@ SYMBOLS.append((Version(3, 11, 11), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 11, 12), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 11, 13), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 11, 14), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 11, 15), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 11, 16), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 11, 17), SYMBOLS[-1][1]))
 SYMBOLS.append((
     Version(3, 12, 0), frozenset((
         'AbstractSet', 'Annotated', 'Any', 'AnyStr', 'AsyncContextManager',
@@ -339,6 +346,9 @@ SYMBOLS.append((Version(3, 12, 9), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 12, 10), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 12, 11), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 12, 12), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 12, 13), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 12, 14), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 12, 15), SYMBOLS[-1][1]))
 SYMBOLS.append((
     Version(3, 13, 0), frozenset((
         'AbstractSet', 'Annotated', 'Any', 'AnyStr', 'AsyncContextManager',
@@ -373,6 +383,14 @@ SYMBOLS.append((Version(3, 13, 5), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 13, 6), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 13, 7), SYMBOLS[-1][1]))
 SYMBOLS.append((Version(3, 13, 8), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 13, 9), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 13, 10), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 13, 11), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 13, 12), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 13, 13), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 13, 14), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 13, 15), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 13, 16), SYMBOLS[-1][1]))
 SYMBOLS.append((
     Version(3, 14, 0), frozenset((
         'AbstractSet', 'Annotated', 'Any', 'AnyStr', 'AsyncContextManager',
@@ -397,6 +415,41 @@ SYMBOLS.append((
         'get_overloads', 'get_protocol_members', 'get_type_hints',
         'is_protocol', 'is_typeddict', 'no_type_check',
         'no_type_check_decorator', 'overload', 'override', 'reveal_type',
+        'runtime_checkable',
+    )),
+))
+SYMBOLS.append((Version(3, 14, 1), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 14, 2), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 14, 3), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 14, 4), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 14, 5), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 14, 6), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 14, 7), SYMBOLS[-1][1]))
+SYMBOLS.append((Version(3, 14, 8), SYMBOLS[-1][1]))
+SYMBOLS.append((
+    Version(3, 15, 0), frozenset((
+        'AbstractSet', 'Annotated', 'Any', 'AnyStr', 'AsyncContextManager',
+        'AsyncGenerator', 'AsyncIterable', 'AsyncIterator', 'Awaitable',
+        'BinaryIO', 'Callable', 'ChainMap', 'ClassVar', 'Collection',
+        'Concatenate', 'Container', 'ContextManager', 'Coroutine', 'Counter',
+        'DefaultDict', 'Deque', 'Dict', 'Final', 'ForwardRef', 'FrozenSet',
+        'Generator', 'Generic', 'Hashable', 'IO', 'ItemsView', 'Iterable',
+        'Iterator', 'KeysView', 'List', 'Literal', 'LiteralString', 'Mapping',
+        'MappingView', 'Match', 'MutableMapping', 'MutableSequence',
+        'MutableSet', 'NamedTuple', 'Never', 'NewType', 'NoDefault',
+        'NoExtraItems', 'NoReturn', 'NotRequired', 'Optional', 'OrderedDict',
+        'ParamSpec', 'ParamSpecArgs', 'ParamSpecKwargs', 'Pattern', 'Protocol',
+        'ReadOnly', 'Required', 'Reversible', 'Self', 'Sequence', 'Set',
+        'Sized', 'SupportsAbs', 'SupportsBytes', 'SupportsComplex',
+        'SupportsFloat', 'SupportsIndex', 'SupportsInt', 'SupportsRound',
+        'TYPE_CHECKING', 'Text', 'TextIO', 'Tuple', 'Type', 'TypeAlias',
+        'TypeAliasType', 'TypeForm', 'TypeGuard', 'TypeIs', 'TypeVar',
+        'TypeVarTuple', 'TypedDict', 'Union', 'Unpack', 'ValuesView',
+        'assert_never', 'assert_type', 'cast', 'clear_overloads',
+        'dataclass_transform', 'disjoint_base', 'evaluate_forward_ref',
+        'final', 'get_args', 'get_origin', 'get_overloads',
+        'get_protocol_members', 'get_type_hints', 'is_protocol',
+        'is_typeddict', 'no_type_check', 'overload', 'override', 'reveal_type',
         'runtime_checkable',
     )),
 ))
